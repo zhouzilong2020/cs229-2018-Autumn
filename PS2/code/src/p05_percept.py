@@ -5,6 +5,7 @@ import numpy as np
 
 import util
 
+
 def initial_state():
     """Return the initial state for the perceptron.
 
@@ -15,8 +16,9 @@ def initial_state():
     """
 
     # *** START CODE HERE ***
-    return []
+    return {'beta': [], 'x': []}
     # *** END CODE HERE ***
+
 
 def predict(state, kernel, x_i):
     """Peform a prediction on a given instance x_i given the current state and the kernel.
@@ -30,11 +32,12 @@ def predict(state, kernel, x_i):
         Returns the prediction (i.e 0 or 1)
     """
     # *** START CODE HERE ***
-    sum_ = 0
-    for beta, x in state:
-    	sum_ += beta * kernel(x, x_i)
-    return sign(sum_)
+    _sum = 0
+    for b, x in zip(state.get('beta'), state.get('x')):
+        _sum += b * (kernel(x, x_i))
+    return sign(_sum)
     # *** END CODE HERE ***
+
 
 def update_state(state, kernel, learning_rate, x_i, y_i):
     """Updates the state of the perceptron.
@@ -47,9 +50,14 @@ def update_state(state, kernel, learning_rate, x_i, y_i):
         y_i: A 0 or 1 indicating the label for a single instance
     """
     # *** START CODE HERE ***
-    beta = learning_rate * (y_i - predict(state, kernel, x_i))
-    state.append((beta, x_i))
+    _sum = 0
+    for b, x in zip(state.get('beta'), state.get('x')):
+        _sum += b * (kernel(x, x_i))
+    beta_i = learning_rate * (y_i - sign(_sum))
+    state.get('beta').append(beta_i)
+    state.get('x').append(x_i)
     # *** END CODE HERE ***
+
 
 def sign(a):
     """Gets the sign of a scalar input."""
@@ -57,6 +65,7 @@ def sign(a):
         return 1
     else:
         return 0
+
 
 def dot_kernel(a, b):
     """An implementation of a dot product kernel.
@@ -66,6 +75,7 @@ def dot_kernel(a, b):
         b: A vector
     """
     return np.dot(a, b)
+
 
 def rbf_kernel(a, b, sigma=1):
     """An implementation of the radial basis function kernel.
@@ -79,6 +89,7 @@ def rbf_kernel(a, b, sigma=1):
     distance = (a - b).dot(a - b)
     scaled_distance = -distance / (2 * (sigma) ** 2)
     return math.exp(scaled_distance)
+
 
 def train_perceptron(kernel_name, kernel, learning_rate):
     """Train a perceptron with the given kernel.
@@ -105,15 +116,17 @@ def train_perceptron(kernel_name, kernel, learning_rate):
     plt.figure(figsize=(12, 8))
     util.plot_contour(lambda a: predict(state, kernel, a))
     util.plot_points(test_x, test_y)
-    plt.savefig('./output/p05_{}_output.png'.format(kernel_name))
+    plt.savefig('./output/my_p05_{}_output.png'.format(kernel_name))
 
     predict_y = [predict(state, kernel, test_x[i, :]) for i in range(test_y.shape[0])]
 
-    np.savetxt('./output/p05_{}_predictions'.format(kernel_name), predict_y)
+    np.savetxt('./output/my_p05_{}_predictions'.format(kernel_name), predict_y)
+
 
 def main():
     train_perceptron('dot', dot_kernel, 0.5)
     train_perceptron('rbf', rbf_kernel, 0.5)
+
 
 if __name__ == "__main__":
     main()
