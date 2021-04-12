@@ -1,6 +1,7 @@
 # Important note: you do not have to modify this file for your homework.
 
 import numpy as np
+
 np.random.seed(123)
 
 
@@ -19,6 +20,7 @@ def train_and_predict_svm(train_matrix, train_labels, test_matrix, radius):
     model = svm_train(train_matrix, train_labels, radius)
     return svm_predict(model, test_matrix, radius)
 
+
 def svm_train(matrix, category, radius):
     state = {}
     M, N = matrix.shape
@@ -27,7 +29,7 @@ def svm_train(matrix, category, radius):
     matrix = 1. * (matrix > 0)
     squared = np.sum(matrix * matrix, axis=1)
     gram = matrix.dot(matrix.T)
-    K = np.exp(-(squared.reshape((1, -1)) + squared.reshape((-1, 1)) - 2 * gram) / (2 * (radius ** 2)) )
+    K = np.exp(-(squared.reshape((1, -1)) + squared.reshape((-1, 1)) - 2 * gram) / (2 * (radius ** 2)))
 
     alpha = np.zeros(M)
     alpha_avg = np.zeros(M)
@@ -40,8 +42,8 @@ def svm_train(matrix, category, radius):
         margin = Y[i] * np.dot(K[i, :], alpha)
         grad = M * L * K[:, i] * alpha[i]
         if (margin < 1):
-            grad -=  Y[i] * K[:, i]
-        alpha -=  grad / np.sqrt(ii + 1)
+            grad -= Y[i] * K[:, i]
+        alpha -= grad / np.sqrt(ii + 1)
         alpha_avg += alpha
 
     alpha_avg /= (ii + 1) * M
@@ -52,6 +54,7 @@ def svm_train(matrix, category, radius):
     state['Sqtrain'] = squared
     ####################
     return state
+
 
 def svm_predict(state, matrix, radius):
     M, N = matrix.shape
